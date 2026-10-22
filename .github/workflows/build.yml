@@ -21,16 +21,13 @@ jobs:
           rm -rf build-src
           mkdir -p build-src
 
-          # Automatically find any zip file in the root directory
-          zip_file=$(find . -maxdepth 1 -iname "*.zip" | head -n 1)
-
-          if [ -z "$zip_file" ]; then
-            echo "Error: No zip file found in the repository root!"
+          # Unpack the correct zip file name
+          if [ -f "ImportBoxAndroid.zip" ]; then
+            unzip -q -o ImportBoxAndroid.zip -d build-src
+          else
+            echo "Error: ImportBoxAndroid.zip not found in repository root!"
             exit 1
           fi
-
-          echo "Found zip file: $zip_file"
-          unzip -q -o "$zip_file" -d build-src
 
           project_dir="$(find build-src -type f \( \
             -name 'settings.gradle' -o \
@@ -77,7 +74,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ImportBox-APK
-          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/*.apk
+          path: '**/build/outputs/apk/debug/*.apk'
           if-no-files-found: error
-
-
